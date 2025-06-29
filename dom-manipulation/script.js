@@ -12,7 +12,7 @@ let quotes = [];
         text: post.title,
         category: 'server'
       }));
-      saveQuotes(); // Store in localStorage after fetching
+      saveQuotes();
     } catch (err) {
       console.error("Failed to fetch initial quotes from server:", err);
       quotes = [
@@ -26,7 +26,6 @@ let quotes = [];
 let syncInProgress = false;
 let conflicts = [];
 
-// DOM Elements
 const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteBtn = document.getElementById('newQuote');
 const showFormBtn = document.getElementById('showForm');
@@ -39,13 +38,11 @@ const syncStatus = document.getElementById('syncStatus');
 const conflictModal = document.getElementById('conflictResolutionModal');
 const conflictQuotesContainer = document.getElementById('conflictQuotesContainer');
 
-// Save Quotes
 function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
   localStorage.setItem('lastUpdateTime', new Date().toISOString());
 }
 
-// Initialize App
 function init() {
   populateCategories();
   filterQuotes();
@@ -60,37 +57,22 @@ function init() {
   setInterval(syncWithServer, 5 * 60 * 1000);
 }
 
-// Fetch from simulated server (mock API)
 async function fetchQuotesFromServer() {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const serverQuotes = JSON.parse(JSON.stringify(quotes));
-      if (Math.random() < 0.3) {
-        serverQuotes.forEach(q => {
-          if (Math.random() < 0.3) q.text = "[Server Updated] " + q.text;
-        });
-      }
-      if (Math.random() < 0.2) {
-        serverQuotes.push({
-          text: "A new quote from server",
-          category: "server"
-        });
-      }
-      resolve(serverQuotes);
-    }, 1000);
-  });
+  const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+  const data = await response.json();
+  return data.map(post => ({ text: post.title, category: 'server' }));
 }
 
-// Simulate posting data
 async function postToServer(data) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({ success: true, quotes: data, timestamp: new Date().toISOString() });
-    }, 1000);
+  const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
   });
+  const result = await response.json();
+  return { success: true, quotes: data, timestamp: new Date().toISOString(), result };
 }
 
-// Sync Logic
 async function syncWithServer() {
   if (syncInProgress) return;
   syncInProgress = true;
@@ -147,10 +129,9 @@ function showSyncStatus(msg, className) {
   syncStatus.style.display = 'block';
 }
 
-// Conflict UI
 function showConflictResolutionDialog(conflicts) {
   conflictQuotesContainer.innerHTML = '';
-  conflicts.forEach((conf, i) => {
+  conflicts.forEach(conf => {
     const div = document.createElement('div');
     div.className = 'conflict-quote';
     div.innerHTML = `
@@ -182,14 +163,12 @@ function resolveConflicts(type) {
   syncWithServer();
 }
 
-// Add quote form toggle
 function toggleAddQuoteForm() {
   const form = document.getElementById('addQuoteForm');
   form.style.display = form.style.display === 'none' ? 'block' : 'none';
   showFormBtn.textContent = form.style.display === 'block' ? 'Cancel' : 'Add New Quote';
 }
 
-// Add quote
 function addQuote() {
   const text = document.getElementById('newQuoteText').value.trim();
   const category = document.getElementById('newQuoteCategory').value.trim();
@@ -201,7 +180,6 @@ function addQuote() {
   toggleAddQuoteForm();
 }
 
-// Quote render
 function renderQuote(quote) {
   quoteDisplay.innerHTML = `
     <div class="quote-text">"${quote.text}"</div>
@@ -220,7 +198,6 @@ function showRandomQuote() {
   renderQuote(q);
 }
 
-// Populate dropdown
 function populateCategories() {
   const categories = ['all', ...new Set(quotes.map(q => q.category))];
   categoryFilter.innerHTML = '';
@@ -232,7 +209,6 @@ function populateCategories() {
   });
 }
 
-// Export
 function exportToJsonFile() {
   const dataStr = JSON.stringify(quotes, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
@@ -244,7 +220,6 @@ function exportToJsonFile() {
   URL.revokeObjectURL(url);
 }
 
-// Import
 function importFromJsonFile(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -267,6 +242,7 @@ function importFromJsonFile(event) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 
 
 
