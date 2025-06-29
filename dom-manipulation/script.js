@@ -1,10 +1,27 @@
-let quotes = JSON.parse(localStorage.getItem('quotes')) || [
-  { text: "The only way to do great work is to love what you do.", category: "inspiration" },
-  { text: "Innovation distinguishes between a leader and a follower.", category: "business" },
-  { text: "Your time is limited, don't waste it living someone else's life.", category: "life" },
-  { text: "Stay hungry, stay foolish.", category: "motivation" },
-  { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", category: "life" }
-];
+let quotes = [];
+
+(async function initializeQuotes() {
+  const storedQuotes = localStorage.getItem('quotes');
+  if (storedQuotes) {
+    quotes = JSON.parse(storedQuotes);
+  } else {
+    try {
+      const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
+      const data = await response.json();
+      quotes = data.map(post => ({
+        text: post.title,
+        category: 'server'
+      }));
+      saveQuotes(); // Store in localStorage after fetching
+    } catch (err) {
+      console.error("Failed to fetch initial quotes from server:", err);
+      quotes = [
+        { text: "Default fallback quote.", category: "fallback" }
+      ];
+      saveQuotes();
+    }
+  }
+})();
 
 let syncInProgress = false;
 let conflicts = [];
@@ -45,7 +62,6 @@ function init() {
 
 // Fetch from simulated server (mock API)
 async function fetchQuotesFromServer() {
-  // Replace this with real fetch call to mock API if needed
   return new Promise(resolve => {
     setTimeout(() => {
       const serverQuotes = JSON.parse(JSON.stringify(quotes));
@@ -251,6 +267,7 @@ function importFromJsonFile(event) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 
 
 
