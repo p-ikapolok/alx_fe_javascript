@@ -45,6 +45,9 @@
     #importQuotes {
       background-color: #ff9800;
     }
+    #syncNow {
+      background-color: #9c27b0;
+    }
     button:hover {
       opacity: 0.9;
     }
@@ -76,6 +79,49 @@
       border-radius: 4px;
       border: 1px solid #ddd;
     }
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      z-index: 1000;
+      animation: fadeIn 0.5s;
+    }
+    .notification.error {
+      background: #f44336;
+    }
+    .conflict-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px;
+      background: #ff9800;
+      color: white;
+      border-radius: 5px;
+      z-index: 1000;
+      animation: fadeIn 0.5s;
+    }
+    .conflict-notification button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .sync-status {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -86,6 +132,7 @@
     <button id="showForm">Add New Quote</button>
     <button id="exportQuotes">Export Quotes</button>
     <button id="importQuotes">Import Quotes</button>
+    <button id="syncNow">Sync Now</button>
     <input type="file" id="fileInput" accept=".json" />
   </div>
   
@@ -105,6 +152,9 @@
     <button onclick="addQuote()">Add Quote</button>
   </div>
   
-  <script src="script.js"></script>
+  <div class="sync-status">
+    <p>Last sync: <span id="lastSyncTime">Never</span></p>
+    <p>Status: <span id="syncStatus">Not connected</span></p>
+  </div>
 </body>
 </html>
