@@ -40,6 +40,12 @@
     button:hover {
       background-color: #45a049;
     }
+    button.secondary {
+      background-color: #2196F3;
+    }
+    button.secondary:hover {
+      background-color: #0b7dda;
+    }
     input {
       padding: 8px;
       margin: 5px 0;
@@ -51,6 +57,9 @@
     }
     .controls {
       margin: 20px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
     }
   </style>
 </head>
@@ -60,6 +69,7 @@
   <div class="controls">
     <button id="newQuote">Show Random Quote</button>
     <button id="showForm">Add New Quote</button>
+    <button id="exportQuotes" class="secondary">Export Quotes</button>
   </div>
   
   <div class="category-filter">
