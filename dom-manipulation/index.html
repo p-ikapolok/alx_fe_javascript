@@ -45,7 +45,7 @@
     #importQuotes {
       background-color: #ff9800;
     }
-    #syncNow {
+    #syncQuotes {
       background-color: #9c27b0;
     }
     button:hover {
@@ -79,48 +79,57 @@
       border-radius: 4px;
       border: 1px solid #ddd;
     }
-    .notification {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 15px;
-      background: #4CAF50;
-      color: white;
-      border-radius: 5px;
-      z-index: 1000;
-      animation: fadeIn 0.5s;
-    }
-    .notification.error {
-      background: #f44336;
-    }
-    .conflict-notification {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 15px;
-      background: #ff9800;
-      color: white;
-      border-radius: 5px;
-      z-index: 1000;
-      animation: fadeIn 0.5s;
-    }
-    .conflict-notification button {
-      margin-left: 10px;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .sync-status {
+    #syncStatus {
       margin-top: 20px;
       padding: 10px;
-      background-color: #f0f0f0;
       border-radius: 4px;
-      font-size: 0.9em;
+      display: none;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .sync-success {
+      background-color: #dff0d8;
+      color: #3c763d;
+      border: 1px solid #d6e9c6;
+    }
+    .sync-error {
+      background-color: #f2dede;
+      color: #a94442;
+      border: 1px solid #ebccd1;
+    }
+    .sync-conflict {
+      background-color: #fcf8e3;
+      color: #8a6d3b;
+      border: 1px solid #faebcc;
+    }
+    #conflictResolutionModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 600px;
+    }
+    .conflict-quote {
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .conflict-actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
     }
   </style>
 </head>
@@ -132,7 +141,7 @@
     <button id="showForm">Add New Quote</button>
     <button id="exportQuotes">Export Quotes</button>
     <button id="importQuotes">Import Quotes</button>
-    <button id="syncNow">Sync Now</button>
+    <button id="syncQuotes">Sync with Server</button>
     <input type="file" id="fileInput" accept=".json" />
   </div>
   
@@ -152,9 +161,19 @@
     <button onclick="addQuote()">Add Quote</button>
   </div>
   
-  <div class="sync-status">
-    <p>Last sync: <span id="lastSyncTime">Never</span></p>
-    <p>Status: <span id="syncStatus">Not connected</span></p>
+  <div id="syncStatus"></div>
+  
+  <div id="conflictResolutionModal">
+    <div class="modal-content">
+      <h3>Conflict Resolution</h3>
+      <p>We found conflicting versions of quotes. Please choose which version to keep:</p>
+      <div id="conflictQuotesContainer"></div>
+      <div class="conflict-actions">
+        <button onclick="resolveConflicts('server')">Use Server Version</button>
+        <button onclick="resolveConflicts('local')">Use Local Version</button>
+        <button onclick="resolveConflicts('merge')">Merge Changes</button>
+      </div>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
