@@ -1375,7 +1375,6 @@
 
 
 
-
 // Initial quotes data - now checks localStorage first
 let quotes = JSON.parse(localStorage.getItem('quotes')) || [
   { text: "The only way to do great work is to love what you do.", category: "inspiration" },
