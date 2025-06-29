@@ -58,19 +58,23 @@ function init() {
 }
 
 async function fetchQuotesFromServer() {
-  const response = await fetch('https://jsonplaceholder.typicode.com/posts?_limit=5');
-  const data = await response.json();
-  return data.map(post => ({ text: post.title, category: 'server' }));
-}
-
-async function postToServer(data) {
-  const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const serverQuotes = JSON.parse(JSON.stringify(quotes));
+      if (Math.random() < 0.3) {
+        serverQuotes.forEach(q => {
+          if (Math.random() < 0.3) q.text = "[Server Updated] " + q.text;
+        });
+      }
+      if (Math.random() < 0.2) {
+        serverQuotes.push({
+          text: "A new quote from server",
+          category: "server"
+        });
+      }
+      resolve(serverQuotes);
+    }, 1000);
   });
-  const result = await response.json();
-  return { success: true, quotes: data, timestamp: new Date().toISOString(), result };
 }
 
 async function syncWithServer() {
@@ -98,9 +102,19 @@ async function syncWithServer() {
     }
 
     await mergeQuotes(quotes, serverQuotes);
-    const result = await postToServer(quotes);
-    localStorage.setItem('lastSyncTime', result.timestamp);
-    showSyncStatus("Sync successful!", "sync-success");
+
+    const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(quotes)
+    });
+
+    if (!response.ok) throw new Error('Failed to sync with server');
+
+    localStorage.setItem('lastSyncTime', new Date().toISOString());
+    showSyncStatus("Quotes synced with server!", "sync-success");
   } catch (err) {
     console.error(err);
     showSyncStatus("Sync failed: " + err.message, "sync-error");
@@ -242,6 +256,7 @@ function importFromJsonFile(event) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 
 
 
