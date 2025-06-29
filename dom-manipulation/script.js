@@ -44,7 +44,7 @@ function init() {
 }
 
 // Fetch from simulated server (mock API)
-async function fetchFromServer() {
+async function fetchQuotesFromServer() {
   // Replace this with real fetch call to mock API if needed
   return new Promise(resolve => {
     setTimeout(() => {
@@ -81,7 +81,7 @@ async function syncWithServer() {
   showSyncStatus("Syncing with server...", "");
 
   try {
-    const serverQuotes = await fetchFromServer();
+    const serverQuotes = await fetchQuotesFromServer();
     const localMap = Object.fromEntries(quotes.map(q => [q.text, q]));
     const conflictList = [];
 
